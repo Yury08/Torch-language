@@ -4,8 +4,6 @@ import TorchLexer from './gen/TorchLexer'
 import TorchListener from './gen/TorchListener'
 import TorchParser, {
 	ExprContext,
-	FunctionCallContext,
-	FunctionsDeclarationsContext,
 	IfStatementContext,
 	LetAssignmentContext,
 	LetDeclarationContext,
@@ -70,43 +68,43 @@ class TorchTreeWalker extends TorchListener {
 		this.instructions.push(`(loop \n${bodyBlock}\n(br_if 0 ${condition}))`)
 	}
 
-	enterFunctionDeclaration = (ctx: FunctionsDeclarationsContext) => {
-		this.blockStack.push(this.instructions)
-		this.instructions = []
-		this.currentFunction = ctx.ID(0).getText()
-		this.locals[this.currentFunction] = []
-	}
+	// enterFunctionDeclaration = (ctx: FunctionsDeclarationsContext) => {
+	// 	this.blockStack.push(this.instructions)
+	// 	this.instructions = []
+	// 	this.currentFunction = ctx.ID(0).getText()
+	// 	this.locals[this.currentFunction] = []
+	// }
 
-	exitFunctionDeclaration = (ctx: FunctionsDeclarationsContext) => {
-		const functionName = ctx.ID(0).getText()
-		const locals = this.locals[this.currentFunction].join('\n')
-		const params = ctx
-			.ID_list()
-			.slice(1)
-			.map(id => `(param $${id.getText()} f32)`)
-			.join(' ')
+	// exitFunctionDeclaration = (ctx: FunctionsDeclarationsContext) => {
+	// 	const functionName = ctx.ID(0).getText()
+	// 	const locals = this.locals[this.currentFunction].join('\n')
+	// 	const params = ctx
+	// 		.ID_list()
+	// 		.slice(1)
+	// 		.map(id => `(param $${id.getText()} f32)`)
+	// 		.join(' ')
 
-		const bodyBlock = this.instructions.join('\n')
+	// 	const bodyBlock = this.instructions.join('\n')
 
-		this.functions.push(
-			`(func $${functionName} ${params} (result f32)\n${locals}\n${bodyBlock})`
-		)
+	// 	this.functions.push(
+	// 		`(func $${functionName} ${params} (result f32)\n${locals}\n${bodyBlock})`
+	// 	)
 
-		this.instructions = this.blockStack.pop()!
-		this.currentFunction = '~global'
-	}
+	// 	this.instructions = this.blockStack.pop()!
+	// 	this.currentFunction = '~global'
+	// }
 
-	exitFunctionCall = (ctx: FunctionCallContext) => {
-		const functionName = ctx.ID().getText()
-		const args = ctx
-			.expr_list()
-			.map(arg =>
-				arg.INT()
-					? `(f32.const ${arg.INT().getText()})`
-					: `(local.get $${arg.ID().getText()})`
-			)
-		this.exprStack.push(`(call $${functionName} ${args.join(' ')})`)
-	}
+	// exitFunctionCall = (ctx: FunctionCallContext) => {
+	// 	const functionName = ctx.ID().getText()
+	// 	const args = ctx
+	// 		.expr_list()
+	// 		.map(arg =>
+	// 			arg.INT()
+	// 				? `(f32.const ${arg.INT().getText()})`
+	// 				: `(local.get $${arg.ID().getText()})`
+	// 		)
+	// 	this.exprStack.push(`(call $${functionName} ${args.join(' ')})`)
+	// }
 
 	exitReturnExpr = (_ctx: ReturnStatementContext) => {
 		const expr = this.exprStack.pop()

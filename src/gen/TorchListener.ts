@@ -9,13 +9,10 @@ import { LetDeclarationContext } from "./TorchParser.js";
 import { LetAssignmentContext } from "./TorchParser.js";
 import { IfStatementContext } from "./TorchParser.js";
 import { WhileStatementContext } from "./TorchParser.js";
-import { FunctionsDeclarationsContext } from "./TorchParser.js";
-import { FunctionCallContext } from "./TorchParser.js";
 import { BlockContext } from "./TorchParser.js";
 import { ComparisionOperatorContext } from "./TorchParser.js";
 import { ReturnStatementContext } from "./TorchParser.js";
 import { ExprContext } from "./TorchParser.js";
-import { ArgContext } from "./TorchParser.js";
 
 
 /**
@@ -84,26 +81,6 @@ export default class TorchListener extends ParseTreeListener {
 	 */
 	exitWhileStatement?: (ctx: WhileStatementContext) => void;
 	/**
-	 * Enter a parse tree produced by `TorchParser.functionsDeclarations`.
-	 * @param ctx the parse tree
-	 */
-	enterFunctionsDeclarations?: (ctx: FunctionsDeclarationsContext) => void;
-	/**
-	 * Exit a parse tree produced by `TorchParser.functionsDeclarations`.
-	 * @param ctx the parse tree
-	 */
-	exitFunctionsDeclarations?: (ctx: FunctionsDeclarationsContext) => void;
-	/**
-	 * Enter a parse tree produced by `TorchParser.functionCall`.
-	 * @param ctx the parse tree
-	 */
-	enterFunctionCall?: (ctx: FunctionCallContext) => void;
-	/**
-	 * Exit a parse tree produced by `TorchParser.functionCall`.
-	 * @param ctx the parse tree
-	 */
-	exitFunctionCall?: (ctx: FunctionCallContext) => void;
-	/**
 	 * Enter a parse tree produced by `TorchParser.block`.
 	 * @param ctx the parse tree
 	 */
@@ -143,15 +120,5 @@ export default class TorchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitExpr?: (ctx: ExprContext) => void;
-	/**
-	 * Enter a parse tree produced by `TorchParser.arg`.
-	 * @param ctx the parse tree
-	 */
-	enterArg?: (ctx: ArgContext) => void;
-	/**
-	 * Exit a parse tree produced by `TorchParser.arg`.
-	 * @param ctx the parse tree
-	 */
-	exitArg?: (ctx: ArgContext) => void;
 }
 
