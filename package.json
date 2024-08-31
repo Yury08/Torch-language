@@ -1,0 +1,23 @@
+{
+	"name": "torch_language",
+	"version": "1.0.0",
+	"description": "DSL Torch",
+	"main": "index.js",
+	"scripts": {
+		"watch": "deno run -A --unstable-sloppy-imports --watch index.ts",
+		"once": "deno run -A --unstable-sloppy-imports compile.ts",
+		"gen": "antlr4 -Dlanguage=TypeScript -o src/gen Torch.g4",
+		"compile": "deno run -A --unstable-sloppy-imports compile.ts"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"@types/node": "^22.5.0",
+		"typescript": "^5.5.4"
+	},
+	"dependencies": {
+		"antlr4": "^4.13.2",
+		"wabt": "^1.0.36"
+	}
+}

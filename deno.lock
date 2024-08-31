@@ -1,0 +1,46 @@
+{
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "npm:@types/node@^22.5.0": "npm:@types/node@22.5.0",
+      "npm:antlr4@^4.13.2": "npm:antlr4@4.13.2",
+      "npm:typescript@^5.5.4": "npm:typescript@5.5.4",
+      "npm:wabt@^1.0.36": "npm:wabt@1.0.36"
+    },
+    "npm": {
+      "@types/node@22.5.0": {
+        "integrity": "sha512-DkFrJOe+rfdHTqqMg0bSNlGlQ85hSoh2TPzZyhHsXnMtligRWpxUySiyw8FY14ITt24HVCiQPWxS3KO/QlGmWg==",
+        "dependencies": {
+          "undici-types": "undici-types@6.19.8"
+        }
+      },
+      "antlr4@4.13.2": {
+        "integrity": "sha512-QiVbZhyy4xAZ17UPEuG3YTOt8ZaoeOR1CvEAqrEsDBsOqINslaB147i9xqljZqoyf5S+EUlGStaj+t22LT9MOg==",
+        "dependencies": {}
+      },
+      "typescript@5.5.4": {
+        "integrity": "sha512-Mtq29sKDAEYP7aljRgtPOpTvOfbwRWlS6dPRzwjdE+C0R4brX/GUyhHSecbHMFLNBLcJIPt9nl9yG5TZ1weH+Q==",
+        "dependencies": {}
+      },
+      "undici-types@6.19.8": {
+        "integrity": "sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==",
+        "dependencies": {}
+      },
+      "wabt@1.0.36": {
+        "integrity": "sha512-GAfEcFyvYRZ51xIZKeeCmIKytTz3ejCeEU9uevGNhEnqt9qXp3a8Q2O4ByZr6rKWcd8jV/Oj5cbDJFtmTYdchg==",
+        "dependencies": {}
+      }
+    }
+  },
+  "remote": {},
+  "workspace": {
+    "packageJson": {
+      "dependencies": [
+        "npm:@types/node@^22.5.0",
+        "npm:antlr4@^4.13.2",
+        "npm:typescript@^5.5.4",
+        "npm:wabt@^1.0.36"
+      ]
+    }
+  }
+}
