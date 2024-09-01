@@ -9,6 +9,10 @@ import { LetDeclarationContext } from "./TorchParser.js";
 import { LetAssignmentContext } from "./TorchParser.js";
 import { IfStatementContext } from "./TorchParser.js";
 import { WhileStatementContext } from "./TorchParser.js";
+import { FunctionDeclarationContext } from "./TorchParser.js";
+import { ParametersContext } from "./TorchParser.js";
+import { FunctionCallContext } from "./TorchParser.js";
+import { ArgumentsContext } from "./TorchParser.js";
 import { BlockContext } from "./TorchParser.js";
 import { ComparisionOperatorContext } from "./TorchParser.js";
 import { ReturnStatementContext } from "./TorchParser.js";
@@ -80,6 +84,46 @@ export default class TorchListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitWhileStatement?: (ctx: WhileStatementContext) => void;
+	/**
+	 * Enter a parse tree produced by `TorchParser.functionDeclaration`.
+	 * @param ctx the parse tree
+	 */
+	enterFunctionDeclaration?: (ctx: FunctionDeclarationContext) => void;
+	/**
+	 * Exit a parse tree produced by `TorchParser.functionDeclaration`.
+	 * @param ctx the parse tree
+	 */
+	exitFunctionDeclaration?: (ctx: FunctionDeclarationContext) => void;
+	/**
+	 * Enter a parse tree produced by `TorchParser.parameters`.
+	 * @param ctx the parse tree
+	 */
+	enterParameters?: (ctx: ParametersContext) => void;
+	/**
+	 * Exit a parse tree produced by `TorchParser.parameters`.
+	 * @param ctx the parse tree
+	 */
+	exitParameters?: (ctx: ParametersContext) => void;
+	/**
+	 * Enter a parse tree produced by `TorchParser.functionCall`.
+	 * @param ctx the parse tree
+	 */
+	enterFunctionCall?: (ctx: FunctionCallContext) => void;
+	/**
+	 * Exit a parse tree produced by `TorchParser.functionCall`.
+	 * @param ctx the parse tree
+	 */
+	exitFunctionCall?: (ctx: FunctionCallContext) => void;
+	/**
+	 * Enter a parse tree produced by `TorchParser.arguments`.
+	 * @param ctx the parse tree
+	 */
+	enterArguments?: (ctx: ArgumentsContext) => void;
+	/**
+	 * Exit a parse tree produced by `TorchParser.arguments`.
+	 * @param ctx the parse tree
+	 */
+	exitArguments?: (ctx: ArgumentsContext) => void;
 	/**
 	 * Enter a parse tree produced by `TorchParser.block`.
 	 * @param ctx the parse tree

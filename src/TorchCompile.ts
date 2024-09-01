@@ -4,6 +4,8 @@ import TorchLexer from './gen/TorchLexer'
 import TorchListener from './gen/TorchListener'
 import TorchParser, {
 	ExprContext,
+	FunctionCallContext,
+	FunctionDeclarationContext,
 	IfStatementContext,
 	LetAssignmentContext,
 	LetDeclarationContext,
@@ -106,10 +108,93 @@ class TorchTreeWalker extends TorchListener {
 	// 	this.exprStack.push(`(call $${functionName} ${args.join(' ')})`)
 	// }
 
-	exitReturnExpr = (_ctx: ReturnStatementContext) => {
+	enterFunctionDeclaration = (ctx: FunctionDeclarationContext) => {
+		const funcName: string = ctx.ID().getText()
+		this.currentFunction = funcName
+		this.locals[funcName] = [] // инициализируем локальные переменные для функции
+		this.blockStack.push(this.instructions) // сохраняем все интрукции до объявления функции
+		this.instructions = []
+		console.log(`Func declaration: ${funcName}`)
+	}
+
+	exitFunctionDeclaration = (ctx: FunctionDeclarationContext) => {
+		const funcName: string = ctx.ID().getText()
+		let wasmCode = `( func $${funcName}`
+
+		const params = ctx.parameters()?.ID_list() || []
+		params.forEach(param => {
+			wasmCode += `(param $${param.getText()} f32)`
+		})
+
+		wasmCode += ` (result f32)`
+
+		const locals = this.locals[this.currentFunction].join('\n')
+		wasmCode += `${locals}`
+
+		const funcBody = this.instructions.join('\n')
+		wasmCode += `\n${funcBody}`
+		wasmCode += `)`
+
+		this.functions.push(wasmCode)
+		this.instructions = this.blockStack.pop()!
+		this.currentFunction = '~global'
+
+		console.log(`Generated WebAssembly code for function ${funcName}`)
+	}
+
+	enterFunctionCall = (ctx: FunctionCallContext) => {
+		const funcName: string = ctx.ID().getText()
+		// let wasmCode = `(call $${funcName}`
+
+		// const args =
+		// 	ctx
+		// 		.arguments()
+		// 		?.expr_list()
+		// 		.map(exprCtx => this.evaluateExpression(exprCtx)) || []
+
+		const argsCont = ctx.arguments().expr_list().length
+		const args: string[] = []
+
+		for (let i = 0; i < argsCont; i++) {
+			let exprVal = this.exprStack.pop()
+			if (exprVal !== undefined) {
+				args.unshift(exprVal)
+			}
+		}
+
+		// wasmCode += `) \n`
+		this.exprStack.push(`(call $${funcName} ${args.join(' ')})`)
+
+		console.log(
+			`Generated WebAssembly call for function ${funcName} with args: ${args.join(
+				', '
+			)}`
+		)
+	}
+
+	exitReturnExpr = (ctx: ReturnStatementContext) => {
 		const expr = this.exprStack.pop()
 		this.instructions.push(`${expr}`)
 	}
+
+	// private evaluateExpression = (ctx: ExprContext): string => {
+	// 	if (ctx.functionCall()) {
+	// 		this.enterFunctionCall(ctx.functionCall())
+	// 		return `(f32.const 0)` // TODO: добавить логику, чтобы можно было передавать функции в аргументах других функций
+	// 	} else if (ctx.ID()) {
+	// 		const letName = ctx.ID().getText()
+	// 		if (
+	// 			!this.locals[this.currentFunction].includes(letName) &&
+	// 			!this.locals['~global'].includes(letName)
+	// 		) {
+	// 			console.error(`Variable ${letName} is not defined`)
+	// 		}
+	// 		return `(get_local $${letName})`
+	// 	} else if (ctx.INT()) {
+	// 		return `(f32.const ${ctx.INT().getText()})`
+	// 	}
+	// 	return `(f32.const 0)`
+	// }
 
 	exitExpr = (ctx: ExprContext) => {
 		if (ctx.INT()) {

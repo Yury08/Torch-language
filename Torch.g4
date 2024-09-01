@@ -9,9 +9,11 @@ prog: statements+ EOF;  // EOF (end of file) то есть парсер зачи
 statements: 
     letDeclaration 
     | letAssignment 
+    | functionDeclaration
     | ifStatement
     | whileStatement 
     | returnStatement
+    | functionCall
     | expr;
 
 letDeclaration: 'let' ID ('=' expr)?;
@@ -21,8 +23,14 @@ ifStatement: 'if' '(' expr ')' block;
 
 whileStatement: 'while' '(' expr ')' block;
 
-// functionsDeclarations: 'func' ID '(' (ID (',' ID)*)? ')' block;
-// functionCall: ID '(' (expr (',' expr)*)? ')';
+functionDeclaration: 'func' ID '(' parameters? ')' block;
+
+parameters: (ID (',' ID)*)?; //  Определяет список параметров функции, разделенных запятыми.
+
+functionCall: ID '(' arguments? ')';
+
+arguments: (expr (',' expr)*)?; // Описывает список аргументов для вызова функции.
+
 
 block: '{' statements+ '}';
 
@@ -30,15 +38,15 @@ block: '{' statements+ '}';
 comparisionOperator: '==' | '!=' | '<' | '>' | '<=' | '>=';
 returnStatement: 'return' expr?;
 
-expr: 
-    expr ('*' | '/') expr
-    |expr ('+' | '-') expr
+expr:
+    functionCall
+    | expr ('*' | '/') expr
+    | expr ('+' | '-') expr
     | expr comparisionOperator expr
     | '(' expr ')'
     | INT
     | ID
     ;
-
 
 ID: [a-zA-Z_*][a-zA-Z0-9_]*;
 INT: [0-9]+;
