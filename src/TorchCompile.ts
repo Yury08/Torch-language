@@ -29,7 +29,6 @@ class TorchTreeWalker extends TorchListener {
 
 	exitLetDeclaration = (ctx: LetDeclarationContext) => {
 		if (ctx.ID()) {
-			// ID - имя переменной
 			this.locals[this.currentFunction].push(
 				`(local $${ctx.ID().getText()} f32)`
 			)
@@ -70,49 +69,11 @@ class TorchTreeWalker extends TorchListener {
 		this.instructions.push(`(loop \n${bodyBlock}\n(br_if 0 ${condition}))`)
 	}
 
-	// enterFunctionDeclaration = (ctx: FunctionsDeclarationsContext) => {
-	// 	this.blockStack.push(this.instructions)
-	// 	this.instructions = []
-	// 	this.currentFunction = ctx.ID(0).getText()
-	// 	this.locals[this.currentFunction] = []
-	// }
-
-	// exitFunctionDeclaration = (ctx: FunctionsDeclarationsContext) => {
-	// 	const functionName = ctx.ID(0).getText()
-	// 	const locals = this.locals[this.currentFunction].join('\n')
-	// 	const params = ctx
-	// 		.ID_list()
-	// 		.slice(1)
-	// 		.map(id => `(param $${id.getText()} f32)`)
-	// 		.join(' ')
-
-	// 	const bodyBlock = this.instructions.join('\n')
-
-	// 	this.functions.push(
-	// 		`(func $${functionName} ${params} (result f32)\n${locals}\n${bodyBlock})`
-	// 	)
-
-	// 	this.instructions = this.blockStack.pop()!
-	// 	this.currentFunction = '~global'
-	// }
-
-	// exitFunctionCall = (ctx: FunctionCallContext) => {
-	// 	const functionName = ctx.ID().getText()
-	// 	const args = ctx
-	// 		.expr_list()
-	// 		.map(arg =>
-	// 			arg.INT()
-	// 				? `(f32.const ${arg.INT().getText()})`
-	// 				: `(local.get $${arg.ID().getText()})`
-	// 		)
-	// 	this.exprStack.push(`(call $${functionName} ${args.join(' ')})`)
-	// }
-
 	enterFunctionDeclaration = (ctx: FunctionDeclarationContext) => {
 		const funcName: string = ctx.ID().getText()
 		this.currentFunction = funcName
-		this.locals[funcName] = [] // инициализируем локальные переменные для функции
-		this.blockStack.push(this.instructions) // сохраняем все интрукции до объявления функции
+		this.locals[funcName] = []
+		this.blockStack.push(this.instructions)
 		this.instructions = []
 		console.log(`Func declaration: ${funcName}`)
 	}
@@ -132,7 +93,14 @@ class TorchTreeWalker extends TorchListener {
 		wasmCode += `${locals}`
 
 		const funcBody = this.instructions.join('\n')
+
 		wasmCode += `\n${funcBody}`
+
+		// чтобы не было ошибки, когда из функии ничего не возвращается
+		if (!wasmCode.includes(`(return)`)) {
+			wasmCode += `\n(return (f32.const 0))`
+		}
+
 		wasmCode += `)`
 
 		this.functions.push(wasmCode)
@@ -142,16 +110,8 @@ class TorchTreeWalker extends TorchListener {
 		console.log(`Generated WebAssembly code for function ${funcName}`)
 	}
 
-	enterFunctionCall = (ctx: FunctionCallContext) => {
+	exitFunctionCall = (ctx: FunctionCallContext) => {
 		const funcName: string = ctx.ID().getText()
-		// let wasmCode = `(call $${funcName}`
-
-		// const args =
-		// 	ctx
-		// 		.arguments()
-		// 		?.expr_list()
-		// 		.map(exprCtx => this.evaluateExpression(exprCtx)) || []
-
 		const argsCont = ctx.arguments().expr_list().length
 		const args: string[] = []
 
@@ -162,7 +122,6 @@ class TorchTreeWalker extends TorchListener {
 			}
 		}
 
-		// wasmCode += `) \n`
 		this.exprStack.push(`(call $${funcName} ${args.join(' ')})`)
 
 		console.log(
@@ -172,29 +131,14 @@ class TorchTreeWalker extends TorchListener {
 		)
 	}
 
-	exitReturnExpr = (ctx: ReturnStatementContext) => {
+	exitReturnStatement = (_ctx: ReturnStatementContext) => {
 		const expr = this.exprStack.pop()
-		this.instructions.push(`${expr}`)
+		if (expr) {
+			this.instructions.push(`(return ${expr})`)
+		} else {
+			this.instructions.push(`(return)`)
+		}
 	}
-
-	// private evaluateExpression = (ctx: ExprContext): string => {
-	// 	if (ctx.functionCall()) {
-	// 		this.enterFunctionCall(ctx.functionCall())
-	// 		return `(f32.const 0)` // TODO: добавить логику, чтобы можно было передавать функции в аргументах других функций
-	// 	} else if (ctx.ID()) {
-	// 		const letName = ctx.ID().getText()
-	// 		if (
-	// 			!this.locals[this.currentFunction].includes(letName) &&
-	// 			!this.locals['~global'].includes(letName)
-	// 		) {
-	// 			console.error(`Variable ${letName} is not defined`)
-	// 		}
-	// 		return `(get_local $${letName})`
-	// 	} else if (ctx.INT()) {
-	// 		return `(f32.const ${ctx.INT().getText()})`
-	// 	}
-	// 	return `(f32.const 0)`
-	// }
 
 	exitExpr = (ctx: ExprContext) => {
 		if (ctx.INT()) {
