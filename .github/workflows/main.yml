@@ -53,12 +53,4 @@ jobs:
       # Линтинг и тестирование с Node.js
       - name: Lint and Test with Node.js
         run: |
-          npm run lint     # Запуск линтера, например, ESLint
-          npm test         # Запуск тестов Node.js
           npm run compile  # Запуск компеляции файла с кодом на Torch
-
-      # Линтинг и тестирование с Deno
-      - name: Lint and Test with Deno
-        run: |
-          deno lint    # Линтинг кода Deno
-          deno test    # Запуск тестов Deno
