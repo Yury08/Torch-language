@@ -4,6 +4,7 @@
 	"description": "DSL Torch",
 	"main": "index.js",
 	"scripts": {
+		"antlr": "java -jar ./antlr/antlr.jar -Dlanguage=TypeScript -o src/gen Torch.g4",
 		"watch": "deno run -A --unstable-sloppy-imports --watch index.ts",
 		"once": "deno run -A --unstable-sloppy-imports compile.ts",
 		"gen": "antlr4 -Dlanguage=TypeScript -o src/gen Torch.g4",
