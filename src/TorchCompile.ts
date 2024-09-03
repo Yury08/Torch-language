@@ -50,11 +50,22 @@ class TorchTreeWalker extends TorchListener {
 		this.instructions = [] // и очищаем для дальнейших инструкций
 	}
 
-	exitIfStatement = (_ctx: IfStatementContext) => {
+	exitIfStatement = (ctx: IfStatementContext) => {
 		const condition = this.exprStack.pop() // достаем условие
-		const thenBlock = this.instructions.join('\n') // что должно выполниться
-		this.instructions = this.blockStack.pop()! // возвращаем инструкции, которые мы считывали до if, обратно на стэк
-		this.instructions.push(`(if ${condition} (then ${thenBlock}))`)
+		const ifThenBlock = this.instructions[0] // что должно выполниться
+
+		let wasmCode: string = `(if ${condition} (then ${ifThenBlock})`
+
+		if (ctx.block(1)) {
+			const elseBlock = this.instructions[1]
+			console.log(`ELSE BLOCK INSTRUCTIONS: ${elseBlock}`)
+			wasmCode += `(else ${elseBlock})`
+		}
+
+		wasmCode += `)`
+
+		this.instructions = this.blockStack.pop()!
+		this.instructions.push(wasmCode)
 	}
 
 	enterWhileStatement = (_ctx: WhileStatementContext) => {
@@ -135,8 +146,6 @@ class TorchTreeWalker extends TorchListener {
 		const expr = this.exprStack.pop()
 		if (expr) {
 			this.instructions.push(`(return ${expr})`)
-		} else {
-			this.instructions.push(`(return)`)
 		}
 	}
 

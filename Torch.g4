@@ -19,7 +19,7 @@ statements:
 letDeclaration: 'let' ID ('=' expr)?;
 letAssignment: ID '=' expr;
 
-ifStatement: 'if' '(' expr ')' block;
+ifStatement: 'if' '(' expr ')' block ('else' block)?;
 
 whileStatement: 'while' '(' expr ')' block;
 
