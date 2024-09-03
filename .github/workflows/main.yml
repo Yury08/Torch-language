@@ -42,13 +42,13 @@ jobs:
       - name: Install ANTLR
         run: |
           curl -O https://www.antlr.org/download/antlr-4.13.0-complete.jar
-          alias antlr4='java -jar antlr-4.13.0-complete.jar'
-          export CLASSPATH=".:antlr-4.13.0-complete.jar:$CLASSPATH"  
+          mkdir -p antlr
+          mv antlr-4.13.0-complete.jar antlr/antlr.jar
 
       # Сборка ANTLR4 грамматики
       - name: Build ANTLR4 Grammar
         run: |
-          antlr4 -Dlanguage=TypeScript -o src/gen Torch.g4 # npm-скрипт для сборки ANTLR4
+          npm run antlr
 
       # Линтинг и тестирование с Node.js
       - name: Lint and Test with Node.js
