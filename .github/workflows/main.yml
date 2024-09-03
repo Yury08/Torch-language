@@ -1,0 +1,57 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x]  # Используйте нужную версию Node.js
+        deno-version: [1.x]   # Используйте нужную версию Deno
+
+    steps:
+      # Проверяем проект и готовим рабочее окружение
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Установка Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Установка Deno
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{ matrix.deno-version }}
+
+      # Установка зависимостей Node.js
+      - name: Install Node.js dependencies
+        run: npm install
+
+      # Сборка ANTLR4 грамматики
+      - name: Build ANTLR4 Grammar
+        run: |
+          npm run gen # npm-скрипт для сборки ANTLR4
+
+      # Линтинг и тестирование с Node.js
+      - name: Lint and Test with Node.js
+        run: |
+          npm run lint     # Запуск линтера, например, ESLint
+          npm test         # Запуск тестов Node.js
+          npm run compile  # Запуск компеляции файла с кодом на Torch
+
+      # Линтинг и тестирование с Deno
+      - name: Lint and Test with Deno
+        run: |
+          deno lint    # Линтинг кода Deno
+          deno test    # Запуск тестов Deno
